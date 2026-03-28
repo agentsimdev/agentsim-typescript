@@ -1,6 +1,6 @@
 {
   "name": "@agentsim/sdk",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "AgentSIM TypeScript SDK — autonomous OTP relay for AI agents",
   "type": "module",
   "main": "./dist/index.js",
@@ -36,11 +36,12 @@
   "author": "AgentSIM <fathin@agentsim.dev>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agentsimdev/agentsim-typescript"
+    "url": "https://github.com/agentsim/agentsim"
   },
   "homepage": "https://agentsim.dev",
-  "bugs": "https://github.com/agentsimdev/agentsim-typescript/issues",
+  "bugs": "https://github.com/agentsim/agentsim/issues",
   "engines": {
     "node": ">=18"
   }
 }
+
