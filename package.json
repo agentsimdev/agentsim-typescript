@@ -1,7 +1,7 @@
 {
   "name": "@agentsim/sdk",
   "version": "0.10.0",
-  "description": "AgentSIM TypeScript SDK — autonomous OTP relay for AI agents",
+  "description": "AgentSIM TypeScript SDK \u2014 autonomous OTP relay for AI agents",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -44,4 +44,3 @@
     "node": ">=18"
   }
 }
-
