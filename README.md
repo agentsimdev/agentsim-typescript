@@ -41,7 +41,7 @@ import { AgentSimClient } from "@agentsim/sdk";
 const client = new AgentSimClient({ apiKey: "asm_live_xxx" });
 ```
 
-Get your API key at [agentsim.dev/dashboard](https://agentsim.dev/dashboard).
+Get your API key at [console.agentsim.dev](https://console.agentsim.dev).
 
 ## API
 
