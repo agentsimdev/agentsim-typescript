@@ -18,7 +18,7 @@ export {
 } from "./errors.js";
 
 /**
- * Provision a real mobile number for the given agent. Starts a billable session.
+ * Provision a temporary phone number for the given agent. Starts a billable session.
  *
  * **Billing:** $0.99 per session on the Builder plan. Free on Hobby (10 sessions/month limit).
  * Sessions that end with an `OtpTimeoutError` are NOT billed.
