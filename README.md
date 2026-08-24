@@ -1,6 +1,6 @@
 # @agentsim/sdk
 
-TypeScript/JavaScript SDK for AgentSIM — autonomous OTP relay for AI agents. Zero runtime dependencies. Works in Node.js 18+, Bun, Deno, and Edge runtimes.
+AgentSIM is the control plane for agents hitting the real world's auth walls. SMS OTP is the first challenge type. This TypeScript/JavaScript SDK has zero runtime dependencies and works in Node.js 18+, Bun, Deno, and Edge runtimes.
 
 ## Install
 
@@ -16,7 +16,7 @@ import { provision } from "@agentsim/sdk";
 
 // Using AsyncDisposable (TypeScript 5.2+, recommended)
 await using num = await provision({ agentId: "checkout-bot", country: "US" });
-await enterPhoneNumber(num.number);            // "+14155552671"
+await enterPhoneNumber(num.number);            // "+12025550142"
 const otp = await num.waitForOtp({ timeout: 60 });
 await enterOtp(otp.otpCode);                   // "847291"
 // number auto-released via [Symbol.asyncDispose]

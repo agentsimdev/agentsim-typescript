@@ -5,6 +5,8 @@ import type { ProvisionOptions, ProvisionedNumberData } from "./client.js";
 export { AgentSimClient } from "./client.js";
 export { NumberSession } from "./session.js";
 export type { ProvisionOptions, OtpResult, SmsMessage, WaitForOtpOptions, ReregistrationInfo } from "./client.js";
+export { classifyStall } from "./playwright.js";
+export type { ChallengeChannel, LocatorLike, PageLike, StallOutcome, StallSessionEvidence } from "./playwright.js";
 export {
   AgentSimError,
   AuthenticationError,
