@@ -5,6 +5,7 @@ import type { ProvisionOptions, ProvisionedNumberData } from "./client.js";
 export { AgentSimClient } from "./client.js";
 export { NumberSession } from "./session.js";
 export type { ProvisionOptions, OtpResult, SmsMessage, WaitForOtpOptions, ReregistrationInfo } from "./client.js";
+export type { ProvisionOptions as OpenChallengeOptions, WaitForOtpOptions as WaitForVerdictOptions } from "./client.js";
 export { classifyStall } from "./playwright.js";
 export type { ChallengeChannel, LocatorLike, PageLike, StallOutcome, StallSessionEvidence } from "./playwright.js";
 export {
@@ -20,7 +21,7 @@ export {
 } from "./errors.js";
 
 /**
- * Provision a temporary phone number for the given agent. Starts a billable session.
+ * Open an SMS challenge for the given agent. Starts a billable SMS challenge session.
  *
  * **Billing:** $0.99 per session on the Builder plan. Free on Hobby (10 sessions/month limit).
  * Sessions that end with an `OtpTimeoutError` are NOT billed.
@@ -28,13 +29,16 @@ export {
  * Returns a `NumberSession` implementing `AsyncDisposable` — use `await using`
  * in TypeScript 5.2+ for automatic release, or call `num.release()` manually.
  *
+ * `provision` is kept as an alias of `openChallenge`. Same options object,
+ * same `NumberSession`.
+ *
  * @example
  * ```ts
- * await using num = await provision({ agentId: "checkout-bot" });
- * const otp = await num.waitForOtp({ timeout: 60 });
+ * await using num = await openChallenge({ agentId: "checkout-bot" });
+ * const otp = await num.waitForVerdict({ timeout: 60 });
  * ```
  */
-export async function provision(
+export async function openChallenge(
   options: ProvisionOptions,
   clientOrApiKey?: AgentSimClient | string,
 ): Promise<NumberSession> {
@@ -55,4 +59,20 @@ export async function provision(
   });
 
   return new NumberSession(client, data);
+}
+
+/**
+ * Alias of {@link openChallenge}. Same options, same session object.
+ *
+ * @example
+ * ```ts
+ * await using num = await provision({ agentId: "checkout-bot" });
+ * const otp = await num.waitForOtp({ timeout: 60 });
+ * ```
+ */
+export async function provision(
+  options: ProvisionOptions,
+  clientOrApiKey?: AgentSimClient | string,
+): Promise<NumberSession> {
+  return openChallenge(options, clientOrApiKey);
 }

@@ -49,13 +49,15 @@ export class NumberSession implements AsyncDisposable {
   }
 
   /**
-   * Wait for an OTP to arrive on the provisioned number.
+   * Wait for the SMS challenge verdict.
    *
    * Throws `OtpTimeoutError` if no OTP is received within the timeout period.
    * Sessions that time out are NOT billed — the $0.99 charge applies only to
-   * successfully provisioned sessions that do not time out.
+   * successfully opened sessions that do not time out.
+   *
+   * Timeout is seconds. `waitForOtp` is kept as an alias of `waitForVerdict`.
    */
-  async waitForOtp(options: WaitForOtpOptions = {}): Promise<OtpResult> {
+  async waitForVerdict(options: WaitForOtpOptions = {}): Promise<OtpResult> {
     const timeout = options.timeout ?? 60;
     const autoReroute = options.autoReroute ?? false;
     const maxReroutes = options.maxReroutes ?? 2;
@@ -106,6 +108,14 @@ export class NumberSession implements AsyncDisposable {
         }
       }
     }
+  }
+
+  /**
+   * Alias of {@link NumberSession.waitForVerdict}. Same options object.
+   * Timeout is seconds.
+   */
+  async waitForOtp(options: WaitForOtpOptions = {}): Promise<OtpResult> {
+    return this.waitForVerdict(options);
   }
 
   async getMessages(): Promise<SmsMessage[]> {

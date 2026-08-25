@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { provision, PoolExhaustedError, OtpTimeoutError } from "./index.js";
+import { provision, openChallenge, PoolExhaustedError, OtpTimeoutError } from "./index.js";
 import { AgentSimClient } from "./client.js";
 
 const PROVISION_RESPONSE = {
@@ -40,6 +40,24 @@ describe("AgentSIM TypeScript SDK", () => {
     expect(session.sessionId).toBe("sess-abc123");
   });
 
+  it("openChallenge wraps provision with the same session object", async () => {
+    const fetchMock = makeFetch(201, PROVISION_RESPONSE);
+    vi.stubGlobal("fetch", fetchMock);
+    const session = await openChallenge({ agentId: "test-bot", ttlSeconds: 300 }, client);
+    expect(session.number).toBe("+15551234567");
+    expect(session.sessionId).toBe("sess-abc123");
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.agentsim.io/v1/sessions",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          agent_id: "test-bot",
+          ttl_seconds: 300,
+        }),
+      }),
+    );
+  });
+
   it("throws PoolExhaustedError on 503", async () => {
     vi.stubGlobal(
       "fetch",
@@ -76,6 +94,40 @@ describe("AgentSIM TypeScript SDK", () => {
     const session = await provision({ agentId: "test-bot" }, client);
     const result = await session.waitForOtp({ timeout: 30 });
     expect(result.otpCode).toBe("123456");
+  });
+
+  it("waitForVerdict wraps waitForOtp with timeout in seconds", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        statusText: "201",
+        json: async () => PROVISION_RESPONSE,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: "200",
+        json: async () => ({
+          otp_code: "123456",
+          from_number: "+15550000000",
+          received_at: "2026-03-16T18:00:00Z",
+          message_id: "msg-xyz",
+        }),
+      });
+    vi.stubGlobal("fetch", fetchMock);
+    const session = await openChallenge({ agentId: "test-bot" }, client);
+    const result = await session.waitForVerdict({ timeout: 30 });
+    expect(result.otpCode).toBe("123456");
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "https://api.agentsim.io/v1/sessions/sess-abc123/wait",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ timeout_seconds: 30 }),
+      }),
+    );
   });
 
   it("throws OtpTimeoutError on 408", async () => {

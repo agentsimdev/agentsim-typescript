@@ -1,65 +1,66 @@
 # @agentsim/sdk
 
-AgentSIM is the control plane for agents hitting the real world's auth walls. SMS OTP is the first challenge type. This TypeScript/JavaScript SDK has zero runtime dependencies and works in Node.js 18+, Bun, Deno, and Edge runtimes.
+We run the auth challenge so your agent doesn't die there. This TypeScript SDK is the primary published SDK: `openChallenge` opens an SMS challenge, `waitForVerdict` waits for the verdict. `provision` and `waitForOtp` are aliases that still work. Timeouts are seconds. Zero runtime dependencies. Works in Node.js 18+, Bun, Deno, and Edge runtimes.
 
 ## Install
 
 ```bash
-npm install @agentsim/sdk
-# or: bun add @agentsim/sdk
+bun add @agentsim/sdk
+# or: npm install @agentsim/sdk
 ```
 
 ## Quickstart
 
 ```typescript
-import { provision } from "@agentsim/sdk";
+import { openChallenge } from "@agentsim/sdk";
 
-// Using AsyncDisposable (TypeScript 5.2+, recommended)
-await using num = await provision({ agentId: "checkout-bot", country: "US" });
-await enterPhoneNumber(num.number);            // "+12025550142"
-const otp = await num.waitForOtp({ timeout: 60 });
-await enterOtp(otp.otpCode);                   // "847291"
-// number auto-released via [Symbol.asyncDispose]
+await using num = await openChallenge({ agentId: "checkout-bot", country: "US" });
+await enterPhoneNumber(num.number);
+const otp = await num.waitForVerdict({ timeout: 60 });
+await enterOtp(otp.otpCode);
 ```
 
 ```typescript
-// Manual release (Node 18, no using declaration)
-const num = await provision({ agentId: "checkout-bot" });
+const num = await openChallenge({ agentId: "checkout-bot" });
 try {
-  const otp = await num.waitForOtp();
+  const otp = await num.waitForVerdict();
 } finally {
   await num.release();
 }
 ```
 
+`provision` / `waitForOtp` remain aliases of `openChallenge` / `waitForVerdict`.
+
 ## Auth
 
-Set `AGENTSIM_API_KEY` in your environment, or pass `apiKey` to the client constructor:
+Set `AGENTSIM_API_KEY` in your environment, or pass the key as the first constructor argument:
 
 ```typescript
 import { AgentSimClient } from "@agentsim/sdk";
-const client = new AgentSimClient({ apiKey: "asm_live_xxx" });
+const client = new AgentSimClient("asm_live_xxx");
 ```
 
 Get your API key at [console.agentsim.dev](https://console.agentsim.dev).
 
 ## API
 
-### `provision(options)`
+### `openChallenge(options, clientOrApiKey?)`
 
-Provisions a number and returns a `NumberSession`.
+Opens an SMS challenge and returns a `NumberSession`. `provision` is an alias.
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `agentId` | `string` | required | Identifier for your agent |
 | `country` | `string` | `"US"` | ISO country code |
+| `serviceUrl` | `string` | — | Target URL for policy evaluation |
 | `ttlSeconds` | `number` | `3600` | Auto-release after N seconds |
-| `webhookUrl` | `string` | — | POST OTPs here as they arrive |
-| `apiKey` | `string` | env var | Override `AGENTSIM_API_KEY` |
+| `webhookUrl` | `string` | — | POST verdicts here as they arrive |
 
-### `num.waitForOtp(options?)`
+Pass an API key as the second argument, not as a field on `options`.
 
-Waits for an OTP to arrive on the provisioned number.
+### `num.waitForVerdict(options?)`
+
+Waits for the SMS verdict. Timeout is seconds. `waitForOtp` is an alias.
 
 | Option | Type | Default |
 |--------|------|---------|
@@ -67,11 +68,11 @@ Waits for an OTP to arrive on the provisioned number.
 
 Returns `{ otpCode: string, fromNumber: string | null, receivedAt: string }`.
 
-Throws `OtpTimeoutError` if no OTP arrives within `timeout` seconds.
+Throws `OtpTimeoutError` if no verdict arrives within `timeout` seconds.
 
 ### `num.release()`
 
-Releases the number back to the pool early. Called automatically by `[Symbol.asyncDispose]`.
+Closes the challenge session. Called automatically by `[Symbol.asyncDispose]`.
 
 ## Error Reference
 
@@ -79,9 +80,9 @@ Releases the number back to the pool early. Called automatically by `[Symbol.asy
 |-------|------|
 | `AuthenticationError` | Missing or invalid API key |
 | `PoolExhaustedError` | No numbers available in requested country |
-| `OtpTimeoutError` | No OTP arrived within timeout |
+| `OtpTimeoutError` | No verdict arrived within timeout |
 | `RateLimitError` | Too many requests |
 
 ## Supported Countries
 
-US (CA, AU, DE, FR coming soon)
+US
