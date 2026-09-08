@@ -5,7 +5,7 @@ declare const Deno: { env: { get(k: string): string | undefined } } | undefined;
 export interface ProvisionOptions {
   agentId: string;
   country?: string;
-  serviceUrl?: string;
+  serviceUrl: string;
   ttlSeconds?: number;
   webhookUrl?: string;
 }

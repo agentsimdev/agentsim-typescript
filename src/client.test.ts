@@ -11,6 +11,8 @@ const PROVISION_RESPONSE = {
   expires_at: "2026-03-16T20:00:00Z",
 };
 
+const SERVICE_URL = "https://staging.example.com";
+
 function makeFetch(status: number, body: unknown) {
   return vi.fn().mockResolvedValue({
     ok: status >= 200 && status < 300,
@@ -35,7 +37,7 @@ describe("AgentSIM TypeScript SDK", () => {
 
   it("provisions a session", async () => {
     vi.stubGlobal("fetch", makeFetch(201, PROVISION_RESPONSE));
-    const session = await provision({ agentId: "test-bot" }, client);
+    const session = await provision({ agentId: "test-bot", serviceUrl: SERVICE_URL }, client);
     expect(session.number).toBe("+15551234567");
     expect(session.sessionId).toBe("sess-abc123");
   });
@@ -43,7 +45,7 @@ describe("AgentSIM TypeScript SDK", () => {
   it("openChallenge wraps provision with the same session object", async () => {
     const fetchMock = makeFetch(201, PROVISION_RESPONSE);
     vi.stubGlobal("fetch", fetchMock);
-    const session = await openChallenge({ agentId: "test-bot", ttlSeconds: 300 }, client);
+    const session = await openChallenge({ agentId: "test-bot", serviceUrl: SERVICE_URL, ttlSeconds: 300 }, client);
     expect(session.number).toBe("+15551234567");
     expect(session.sessionId).toBe("sess-abc123");
     expect(fetchMock).toHaveBeenCalledWith(
@@ -52,6 +54,7 @@ describe("AgentSIM TypeScript SDK", () => {
         method: "POST",
         body: JSON.stringify({
           agent_id: "test-bot",
+          service_url: SERVICE_URL,
           ttl_seconds: 300,
         }),
       }),
@@ -63,7 +66,7 @@ describe("AgentSIM TypeScript SDK", () => {
       "fetch",
       makeFetch(503, { error: "pool_exhausted", message: "No US numbers available" }),
     );
-    await expect(provision({ agentId: "test-bot" }, client)).rejects.toBeInstanceOf(
+    await expect(provision({ agentId: "test-bot", serviceUrl: SERVICE_URL }, client)).rejects.toBeInstanceOf(
       PoolExhaustedError,
     );
   });
@@ -91,7 +94,7 @@ describe("AgentSIM TypeScript SDK", () => {
           }),
         }),
     );
-    const session = await provision({ agentId: "test-bot" }, client);
+    const session = await provision({ agentId: "test-bot", serviceUrl: SERVICE_URL }, client);
     const result = await session.waitForOtp({ timeout: 30 });
     expect(result.otpCode).toBe("123456");
   });
@@ -117,7 +120,7 @@ describe("AgentSIM TypeScript SDK", () => {
         }),
       });
     vi.stubGlobal("fetch", fetchMock);
-    const session = await openChallenge({ agentId: "test-bot" }, client);
+    const session = await openChallenge({ agentId: "test-bot", serviceUrl: SERVICE_URL }, client);
     const result = await session.waitForVerdict({ timeout: 30 });
     expect(result.otpCode).toBe("123456");
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -151,7 +154,7 @@ describe("AgentSIM TypeScript SDK", () => {
           }),
         }),
     );
-    const session = await provision({ agentId: "test-bot" }, client);
+    const session = await provision({ agentId: "test-bot", serviceUrl: SERVICE_URL }, client);
     await expect(session.waitForOtp({ timeout: 30 })).rejects.toBeInstanceOf(OtpTimeoutError);
   });
 
@@ -173,7 +176,7 @@ describe("AgentSIM TypeScript SDK", () => {
           json: async () => ({}),
         }),
     );
-    const session = await provision({ agentId: "test-bot" }, client);
+    const session = await provision({ agentId: "test-bot", serviceUrl: SERVICE_URL }, client);
     await expect(session.release()).resolves.toBeUndefined();
   });
 });

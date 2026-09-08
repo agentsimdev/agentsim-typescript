@@ -34,7 +34,7 @@ export {
  *
  * @example
  * ```ts
- * await using num = await openChallenge({ agentId: "checkout-bot" });
+ * await using num = await openChallenge({ agentId: "checkout-bot", serviceUrl: "https://staging.example.com" });
  * const otp = await num.waitForVerdict({ timeout: 60 });
  * ```
  */
@@ -53,7 +53,7 @@ export async function openChallenge(
   const data = await client.request<ProvisionedNumberData>("POST", "/sessions", {
     agent_id: options.agentId,
     ...(options.country !== undefined ? { country: options.country } : {}),
-    ...(options.serviceUrl !== undefined ? { service_url: options.serviceUrl } : {}),
+    service_url: options.serviceUrl,
     ttl_seconds: options.ttlSeconds ?? 3600,
     ...(options.webhookUrl ? { webhook_url: options.webhookUrl } : {}),
   });
@@ -66,7 +66,7 @@ export async function openChallenge(
  *
  * @example
  * ```ts
- * await using num = await provision({ agentId: "checkout-bot" });
+ * await using num = await provision({ agentId: "checkout-bot", serviceUrl: "https://staging.example.com" });
  * const otp = await num.waitForOtp({ timeout: 60 });
  * ```
  */

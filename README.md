@@ -14,14 +14,14 @@ bun add @agentsim/sdk
 ```typescript
 import { openChallenge } from "@agentsim/sdk";
 
-await using num = await openChallenge({ agentId: "checkout-bot", country: "US" });
+await using num = await openChallenge({ agentId: "checkout-bot", serviceUrl: "https://staging.example.com", country: "US" });
 await enterPhoneNumber(num.number);
 const otp = await num.waitForVerdict({ timeout: 60 });
 await enterOtp(otp.otpCode);
 ```
 
 ```typescript
-const num = await openChallenge({ agentId: "checkout-bot" });
+const num = await openChallenge({ agentId: "checkout-bot", serviceUrl: "https://staging.example.com" });
 try {
   const otp = await num.waitForVerdict();
 } finally {
@@ -52,7 +52,7 @@ Opens an SMS challenge and returns a `NumberSession`. `provision` is an alias.
 |--------|------|---------|-------------|
 | `agentId` | `string` | required | Identifier for your agent |
 | `country` | `string` | `"US"` | ISO country code |
-| `serviceUrl` | `string` | — | Target URL for policy evaluation |
+| `serviceUrl` | `string` | required | HTTPS origin of the owned target; policy-checked before allocation |
 | `ttlSeconds` | `number` | `3600` | Auto-release after N seconds |
 | `webhookUrl` | `string` | — | POST verdicts here as they arrive |
 
