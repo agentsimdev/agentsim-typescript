@@ -52,8 +52,7 @@ export class NumberSession implements AsyncDisposable {
    * Wait for the SMS challenge verdict.
    *
    * Throws `OtpTimeoutError` if no OTP is received within the timeout period.
-   * Sessions that time out are NOT billed — the $0.99 charge applies only to
-   * successfully opened sessions that do not time out.
+   * A timeout does not undo a successful number assignment or its allowance use.
    *
    * Timeout is seconds. `waitForOtp` is kept as an alias of `waitForVerdict`.
    */

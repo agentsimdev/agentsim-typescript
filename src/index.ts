@@ -23,8 +23,8 @@ export {
 /**
  * Open an SMS challenge for the given agent. Starts a billable SMS challenge session.
  *
- * **Billing:** $0.99 per session on the Builder plan. Free on Hobby (10 sessions/month limit).
- * Sessions that end with an `OtpTimeoutError` are NOT billed.
+ * Live access depends on account terms. Successful assignments can use allowance
+ * even if the wait times out. See https://docs.agentsim.dev/availability.
  *
  * Returns a `NumberSession` implementing `AsyncDisposable` — use `await using`
  * in TypeScript 5.2+ for automatic release, or call `num.release()` manually.

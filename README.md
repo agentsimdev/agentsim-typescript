@@ -2,6 +2,8 @@
 
 We run the auth challenge so your agent doesn't die there. This TypeScript SDK is the primary published SDK: `openChallenge` opens an SMS challenge, `waitForVerdict` waits for the verdict. `provision` and `waitForOtp` are aliases that still work. Timeouts are seconds. Zero runtime dependencies. Works in Node.js 18+, Bun, Deno, and Edge runtimes.
 
+**Availability:** The free Hobby plan includes 10 live US SMS sessions per month for apps you own, with one active live session per account and no card required. Sample demos do not use the allowance. The new paid live offer is not open yet; existing agreements remain unchanged. Check [current access and channel support](https://docs.agentsim.dev/availability) before using live examples.
+
 ## Install
 
 ```bash
@@ -10,6 +12,8 @@ bun add @agentsim/sdk
 ```
 
 ## Quickstart
+
+Set `AGENTSIM_API_KEY` first and replace the target with your owned public HTTPS origin. Browser actions such as `enterPhoneNumber` and `enterOtp` are supplied by your app automation; request the SMS before waiting.
 
 ```typescript
 import { openChallenge } from "@agentsim/sdk";
